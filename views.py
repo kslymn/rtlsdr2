@@ -98,10 +98,10 @@ class MessageDialog(ViewBase):
 		self.accept = accept
 		self.cancel = cancel
 		self.buttons = ui.ButtonGrid(model.width, model.height, 4, 5)
-		self.buttons.add(3, 4, 'OK', click=self.accept_click, 
+		self.buttons.add(3, 4, 'Onay', click=self.accept_click, 
 			bg_color=freqshow.ACCEPT_BG)
 		if cancel is not None:
-			self.buttons.add(0, 4, 'CANCEL', click=self.cancel_click, 
+			self.buttons.add(0, 4, 'Iptal', click=self.cancel_click, 
 				bg_color=freqshow.CANCEL_BG)
 		self.label = ui.render_text(text, size=freqshow.NUM_FONT,
 			fg=freqshow.BUTTON_FG, bg=freqshow.MAIN_BG)
@@ -154,19 +154,19 @@ class NumberDialog(ViewBase):
 		self.buttons.add(2, 3, '9', font_size=freqshow.NUM_FONT, click=self.number_click)
 		self.buttons.add(1, 4, '0', font_size=freqshow.NUM_FONT, click=self.number_click)
 		self.buttons.add(2, 4, '.', font_size=freqshow.NUM_FONT, click=self.decimal_click)
-		self.buttons.add(0, 4, 'DELETE', click=self.delete_click)
+		self.buttons.add(0, 4, 'Sil', click=self.delete_click)
 		if not allow_negative:
 			# Render a clear button if only positive values are allowed.
-			self.buttons.add(3, 1, 'CLEAR', click=self.clear_click)
+			self.buttons.add(3, 1, 'Temizle', click=self.clear_click)
 		else:
 			# Render a +/- toggle if negative values are allowed.
 			self.buttons.add(3, 1, '+/-', click=self.posneg_click)
-		self.buttons.add(3, 3, 'CANCEL', click=self.cancel_click,
+		self.buttons.add(3, 3, 'Iptal', click=self.cancel_click,
 			bg_color=freqshow.CANCEL_BG)
-		self.buttons.add(3, 4, 'ACCEPT', click=self.accept_click,
+		self.buttons.add(3, 4, 'Onay', click=self.accept_click,
 			bg_color=freqshow.ACCEPT_BG) 
 		if has_auto:
-			self.buttons.add(3, 2, 'AUTO', click=self.auto_click)
+			self.buttons.add(3, 2, 'Auto', click=self.auto_click)
 		# Build label text for faster rendering.
 		self.input_rect = (0, 0, self.model.width, self.buttons.row_size)
 		self.label = ui.render_text(label_text, size=freqshow.MAIN_FONT, 
@@ -193,13 +193,13 @@ class NumberDialog(ViewBase):
 
 	# Button click handlers follow below.
 	def auto_click(self, button):
-		self.value = 'AUTO'
+		self.value = 'Auto'
 
 	def clear_click(self, button):
 		self.value = '0'
 
 	def delete_click(self, button):
-		if self.value == 'AUTO':
+		if self.value == 'Auto':
 			# Ignore delete in auto gain mode.
 			return
 		elif len(self.value) > 1:
@@ -218,7 +218,7 @@ class NumberDialog(ViewBase):
 			self.accept(self.value)
 
 	def decimal_click(self, button):
-		if self.value == 'AUTO':
+		if self.value == 'Auto':
 			# If in auto gain, assume user wants numeric gain with decimal.
 			self.value = '0.'
 		elif self.value.find('.') == -1:
@@ -226,7 +226,7 @@ class NumberDialog(ViewBase):
 			self.value += '.'
 
 	def number_click(self, button):
-		if self.value == '0' or self.value == 'AUTO':
+		if self.value == '0' or self.value == 'Auto':
 			# Replace value with number if no value or auto gain is set.
 			self.value = button.text
 		else:
@@ -234,7 +234,7 @@ class NumberDialog(ViewBase):
 			self.value += button.text
 
 	def posneg_click(self, button):
-		if self.value == 'AUTO':
+		if self.value == 'Auto':
 			# Do nothing if value is auto.
 			return
 		else:
@@ -253,19 +253,15 @@ class SettingsList(ViewBase):
 		self.model      = model
 		self.controller = controller
 		# Create button labels with current model values.
-		centerfreq_text = 'CENTER FREQ: {0:0.2f} MHz'.format(model.get_center_freq())
-		samplerate_text = 'SAMPLE RATE: {0:0.2f} MHz'.format(model.get_sample_rate())
-		gain_text       = 'GAIN: {0} dB'.format(model.get_gain())
-		min_text        = 'MIN: {0} dB'.format(model.get_min_string())
-		max_text        = 'MAX: {0} dB'.format(model.get_max_string())
+		centerfreq_text = 'Frekans: {0:0.2f} MHz'.format(model.get_center_freq())
+		samplerate_text = 'Sample Rate: {0:0.2f} MHz'.format(model.get_sample_rate())
+		
 		# Create buttons.
 		self.buttons = ui.ButtonGrid(model.width, model.height, 4, 5)
 		self.buttons.add(0, 0, centerfreq_text, colspan=4, click=self.centerfreq_click)
 		self.buttons.add(0, 1, samplerate_text, colspan=4, click=self.sample_click)
-		self.buttons.add(0, 2, gain_text,       colspan=4, click=self.gain_click)
-		self.buttons.add(0, 3, min_text,        colspan=2, click=self.min_click)
-		self.buttons.add(2, 3, max_text,        colspan=2, click=self.max_click)
-		self.buttons.add(0, 4, 'BACK', click=self.controller.change_to_main)
+		
+		self.buttons.add(0, 4, 'Geri', click=self.controller.change_to_main)
 
 	def render(self, screen):
 		# Clear view and render buttons.
@@ -277,7 +273,7 @@ class SettingsList(ViewBase):
 
 	# Button click handlers follow below.
 	def centerfreq_click(self, button):
-		self.controller.number_dialog('FREQUENCY:', 'MHz',
+		self.controller.number_dialog('Frekans:', 'MHz',
 			initial='{0:0.2f}'.format(self.model.get_center_freq()),
 			accept=self.centerfreq_accept)
 
@@ -287,7 +283,7 @@ class SettingsList(ViewBase):
 		self.controller.change_to_settings()
 
 	def sample_click(self, button):
-		self.controller.number_dialog('SAMPLE RATE:', 'MHz',
+		self.controller.number_dialog('Sample Rate:', 'MHz',
 			initial='{0:0.2f}'.format(self.model.get_sample_rate()),
 			accept=self.sample_accept)
 
@@ -296,35 +292,8 @@ class SettingsList(ViewBase):
 		self.controller.waterfall.clear_waterfall()
 		self.controller.change_to_settings()
 
-	def gain_click(self, button):
-		self.controller.number_dialog('GAIN:', 'dB',
-			initial=self.model.get_gain(), accept=self.gain_accept, 
-			has_auto=True)
+	
 
-	def gain_accept(self, value):
-		self.model.set_gain(value)
-		self.controller.waterfall.clear_waterfall()
-		self.controller.change_to_settings()
-
-	def min_click(self, button):
-		self.controller.number_dialog('MIN:', 'dB',
-			initial=self.model.get_min_string(), accept=self.min_accept, 
-			has_auto=True, allow_negative=True)
-
-	def min_accept(self, value):
-		self.model.set_min_intensity(value)
-		self.controller.waterfall.clear_waterfall()
-		self.controller.change_to_settings()
-
-	def max_click(self, button):
-		self.controller.number_dialog('MAX:', 'dB',
-			initial=self.model.get_max_string(), accept=self.max_accept, 
-			has_auto=True, allow_negative=True)
-
-	def max_accept(self, value):
-		self.model.set_max_intensity(value)
-		self.controller.waterfall.clear_waterfall()
-		self.controller.change_to_settings()
 
 
 class SpectrogramBase(ViewBase):
@@ -334,9 +303,9 @@ class SpectrogramBase(ViewBase):
 		self.model      = model
 		self.controller = controller
 		self.buttons = ui.ButtonGrid(model.width, model.height, 4, 5)
-		self.buttons.add(0, 0, 'CONFIG', click=self.controller.change_to_settings)
+		self.buttons.add(0, 0, 'Ayarla', click=self.controller.change_to_settings)
 		self.buttons.add(1, 0, 'Spektrum Analizor', colspan=2 )
-		self.buttons.add(3, 0, 'QUIT', click=self.quit_click,
+		self.buttons.add(3, 0, 'Cikis', click=self.quit_click,
 			bg_color=freqshow.CANCEL_BG)
 		self.overlay_enabled = True
 
@@ -412,10 +381,7 @@ class SpectrogramBase(ViewBase):
 			self.buttons.click(location)
 
 	def quit_click(self, button):
-		self.controller.message_dialog('QUIT: Are you sure?',
-			accept=self.quit_accept)
-
-	def quit_accept(self):
+		
 		sys.exit(0)
 
 
